@@ -73,8 +73,8 @@
               	<ul class="nav nav-stacked" id="sidebar">
 				  <li><a data-toggle="tab" href="#home">Home</a></li>
                   <li><a data-toggle="tab" href="#menu1">B-drzewa</a></li>
-                  <li><a data-toggle="tab" href="#menu2">Menu 2</a></li>
-                  <li><a data-toggle="tab" href="#menu3">Menu 3</a></li>
+                  <li><a data-toggle="tab" href="#menu2">Drzewa czerwono czarne</a></li>
+                  <li><a data-toggle="tab" href="#menu3">Programowanie dynamiczne</a></li>
               	</ul>
   				</div>
 			</div>  
@@ -93,7 +93,7 @@
 							Początek programu i definicja struktury.
 							<code>
 							<pre>
-#include <stdio.h> 
+#include < stdio.h > 
 #define T 3
   
 int OstatniW;
@@ -371,12 +371,156 @@ int main(){
 							</code>
 					</div>
 					<div id="menu2" class="tab-pane fade">
-						<h3>Menu 2</h3>
-						<p>Sed ut perspiciatis unde omnis iste natus error sit voluptatem accusantium doloremque laudantium, totam rem aperiam.</p>
+						<h3>Drzewa czerwono czarne</h3>
+						<p>
+							<code>
+							<pre>
+#include < stdio.h >
+#include < stdlib.h >
+typedef struct Wezel{
+	int wartosc;
+	struct Wezel *rodzic;
+	struct Wezel *lewy;
+	struct Wezel *prawy;
+	char kolor; //B=czarny, R=czerwony
+}Wezel;
+
+void WSTAW(struct Wezel *drzewo, int a){
+	struct Wezel *wstawiany = malloc(sizeof(struct Wezel));
+	struct Wezel *tmp = drzewo;
+	struct Wezel *rodzic;
+	struct Wezel *temp;
+	struct Wezel *temp2;
+	
+	wstawiany->wartosc = a;
+	wstawiany->lewy = NULL;
+	wstawiany->prawy = NULL;
+	wstawiany->rodzic = NULL;
+	wstawiany->kolor = 'R';
+	
+	while(tmp != NULL){
+		rodzic = tmp;
+		if(a < tmp->wartosc){tmp = tmp->lewy;}
+		else{tmp = tmp->prawy;}
+	}
+	wstawiany->rodzic = rodzic;	
+	if(rodzic == NULL){
+		wstawiany->kolor = 'B';
+		drzewo = wstawiany;
+	} //ustawia jako korzen gdy drzewo jest puste
+	else{ //zaleznie od wartosci przypisuje element po odpowiedniej stronie rodzica
+		if(wstawiany->wartosc < rodzic->wartosc){
+			rodzic->lewy = wstawiany;
+			while(rodzic->kolor == 'R'){
+				temp = rodzic->prawy;
+				temp2 = rodzic->rodzic;
+				if(temp->kolor = 'R'){
+					rodzic->kolor = 'B';
+					temp->kolor = 'B';
+					temp2->kolor = 'R';
+					if(temp2->rodzic == NULL){temp2->kolor = 'B';}
+					rodzic = temp2->rodzic;
+				}
+			}
+		}
+		else{
+			rodzic->prawy = wstawiany;
+			while(rodzic->kolor == 'R'){
+				temp = rodzic->lewy;
+				temp2 = rodzic->rodzic;
+				if(temp->kolor = 'R'){
+					rodzic->kolor = 'B';
+					temp->kolor = 'B';
+					temp2->kolor = 'R';
+					if(temp2->rodzic == NULL){temp2->kolor = 'B';}
+					rodzic = temp2->rodzic;
+				}
+			}
+		}
+	}
+}
+
+int main(){
+	struct Wezel *korzen = malloc(sizeof(struct Wezel));
+	korzen->rodzic = NULL;
+	korzen->lewy = NULL;
+	korzen->prawy = NULL;
+	korzen->wartosc = 12;
+	korzen->kolor = 'B';
+	
+	return 0;
+}								
+							</pre>
+							</code>			
+						</p>
 					</div>
 					<div id="menu3" class="tab-pane fade">
-						<h3>Menu 3</h3>
-						<p>Eaque ipsa quae ab illo inventore veritatis et quasi architecto beatae vitae dicta sunt explicabo.</p>
+						<h3>Programowanie dynamiczne</h3>
+						<p>	
+							<code>
+							<pre>
+#include < stdio.h >
+#include < string.h >
+int i, j, m, n, c[20][20];
+char x[10], y[10], b[20][20];
+
+void DRUKUJ(int i,int j){
+	if(i==0 || j==0){
+		return;
+	}
+	if(b[i][j] == 's'){ //skos w pseudokodzie "\"
+		DRUKUJ(i-1,j-1);
+		printf("%c",x[i-1]);
+	}
+	else if(b[i][j] == 'g'){ //gora w pseudokoszie "|"
+		DRUKUJ(i-1,j);
+	} 
+	else{	//lewo w pseudzokodzie "-"
+		DRUKUJ(i,j-1);
+	}
+}
+
+void LCS(){
+	m = strlen(x);
+	n = strlen(y);
+	for(i = 0; i <= m; i++){
+		c[i][0]=0;
+	}
+	for(j = 0; j <= n; j++){
+		c[0][j] = 0;
+	}
+	for(i = 1; i <= m; i++){
+		for(j = 1; j <= n; j++){
+			if(x[i-1] == y[j-1]){
+				c[i][j] = c[i-1][j-1] + 1;
+				b[i][j] = 's';
+			} 
+			else if(c[i-1][j] >= c[i][j-1]){
+				c[i][j] = c[i-1][j];
+				b[i][j] = 'g';
+			} 
+			else{
+				c[i][j] = c[i][j-1];
+				b[i][j] = 'l';
+			}
+		}
+	}
+	DRUKUJ(m,n);
+}
+
+int main(void){
+	printf("1 ciag:\n");
+	gets(x);
+	printf("2 ciag:\n");
+	gets(y);
+	printf("Najdluzszy wspolny podciag: \n");
+	LCS();
+	printf("\n");
+	return 0;
+}			
+							</pre>
+							</code>
+						</p>
 					</div>
 				</div>
 			</div><!-- /row -->
